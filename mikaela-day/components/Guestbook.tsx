@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, User, MessageSquare } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { supabase } from '@/lib/supabase';
 
 interface Message {
   id: number;
@@ -16,40 +17,59 @@ const Guestbook = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [name, setName] = useState('');
   const [text, setText] = useState('');
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedMessages = localStorage.getItem('mikaela_guestbook');
-    if (savedMessages) {
-      const parsed = JSON.parse(savedMessages);
-      // Filter out old static messages if they exist in localStorage
-      const filtered = parsed.filter((m: any) => m.name !== 'Léa' && m.name !== 'Thomas');
-      setMessages(filtered);
-    }
-    setIsLoaded(true);
+    fetchMessages();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        setMessages((prev) => [payload.new as Message, ...prev]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('mikaela_guestbook', JSON.stringify(messages));
-    }
-  }, [messages, isLoaded]);
+  const fetchMessages = async () => {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('id', { ascending: false });
 
-  const handleSubmit = (e: React.FormEvent) => {
+    if (error) {
+      console.error('Error fetching messages:', error);
+    } else {
+      setMessages(data || []);
+    }
+    setIsLoading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !text) return;
 
     const now = new Date();
     const formattedDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
 
-    const newMessage: Message = {
-      id: Date.now(),
+    const newMessage = {
       name,
       text,
       date: formattedDate,
     };
 
-    setMessages([newMessage, ...messages]);
+    const { error } = await supabase.from('messages').insert([newMessage]);
+
+    if (error) {
+      console.error('Error saving message:', error);
+      alert('Une erreur est survenue lors de l\'envoi du message.');
+      return;
+    }
+
     setName('');
     setText('');
     
@@ -61,7 +81,15 @@ const Guestbook = () => {
     });
   };
 
-  if (!isLoaded) return null;
+  if (isLoading) {
+    return (
+      <section id="guestbook" className="py-16 md:py-32">
+        <div className="container mx-auto px-4 md:px-6 text-center">
+          <p className="text-foreground/60 animate-pulse">Chargement du livre d'or...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="guestbook" className="py-16 md:py-32">
