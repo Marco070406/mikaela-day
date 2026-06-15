@@ -10,7 +10,7 @@ const Hero = () => {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/assets/image/photo plage.jpg"
+          src="/assets/image/photo-plage.jpg"
           alt="Beach Background"
           fill
           className="object-cover"
