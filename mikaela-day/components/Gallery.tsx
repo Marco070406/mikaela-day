@@ -20,15 +20,25 @@ const Gallery = () => {
   const [filter, setFilter] = useState<'all' | 'photo' | 'video'>('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+
   useEffect(() => {
     fetchMedia();
 
+    // Subscribe to real-time updates for the media table
     const channel = supabase
-      .channel('public:media')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'media' }, (payload) => {
-        setMedia((prev) => [payload.new as MediaItem, ...prev]);
-      })
-      .subscribe();
+      .channel('media-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'media' },
+        (payload) => {
+          console.log('Realtime insert received:', payload.new);
+          setMedia((prev) => [payload.new as MediaItem, ...prev]);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -209,7 +219,10 @@ const Gallery = () => {
                       />
                     )}
                     
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-4">
+                    <div 
+                      className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-4 cursor-pointer"
+                      onClick={() => setSelectedItem(item)}
+                    >
                       {item.type === 'video' && (
                         <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md p-2 rounded-full">
                           <Video className="w-5 h-5 text-white" />
@@ -222,7 +235,10 @@ const Gallery = () => {
                       )}
                       
                       <button
-                        onClick={() => handleDownload(item.url, item.name)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(item.url, item.name);
+                        }}
                         className="bg-white text-foreground p-4 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center gap-2 font-bold text-sm cursor-pointer"
                       >
                         <Download className="w-5 h-5 text-primary" />
@@ -243,6 +259,59 @@ const Gallery = () => {
           )}
         </div>
       </div>
+
+      {/* Lightbox / Preview Modal */}
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+            onClick={() => setSelectedItem(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors bg-white/10 p-3 rounded-full hover:bg-white/20"
+              onClick={() => setSelectedItem(null)}
+            >
+              <X className="w-8 h-8" />
+            </button>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative max-w-5xl w-full max-h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {selectedItem.type === 'photo' ? (
+                <img
+                  src={selectedItem.url}
+                  alt={selectedItem.name}
+                  className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
+                />
+              ) : (
+                <video
+                  src={selectedItem.url}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[80vh] rounded-xl shadow-2xl"
+                />
+              )}
+              
+              <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-6">
+                <button
+                  onClick={() => handleDownload(selectedItem.url, selectedItem.name)}
+                  className="bg-primary text-white px-8 py-3 rounded-full font-bold flex items-center gap-3 hover:bg-rose-gold transition-all shadow-xl active:scale-95"
+                >
+                  <Download className="w-5 h-5" />
+                  Télécharger ce souvenir
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
