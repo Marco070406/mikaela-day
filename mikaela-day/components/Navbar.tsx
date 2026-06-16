@@ -20,6 +20,7 @@ const Navbar = () => {
           <Link href="#hero" className="text-xs font-bold uppercase tracking-[0.3em] hover:text-primary transition-colors">Accueil</Link>
           <Link href="#details" className="text-xs font-bold uppercase tracking-[0.3em] hover:text-primary transition-colors">Détails</Link>
           <Link href="#guestbook" className="text-xs font-bold uppercase tracking-[0.3em] hover:text-primary transition-colors">Livre d'or</Link>
+          <Link href="#gallery" className="text-xs font-bold uppercase tracking-[0.3em] hover:text-primary transition-colors">Galerie</Link>
         </div>
       </div>
     </motion.nav>

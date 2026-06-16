@@ -1,6 +1,7 @@
 'use client';
 
-import { Heart, Camera, Mail, Phone } from 'lucide-react';
+import { Heart, Phone } from 'lucide-react';
+import { FaWhatsapp,  FaInstagram} from 'react-icons/fa';
 
 const Footer = () => {
   return (
@@ -10,21 +11,38 @@ const Footer = () => {
           <div className="flex items-center gap-2 font-serif text-2xl font-bold italic">
             Mikaela's Day
           </div>
-          
+
           <div className="flex gap-6 relative z-50">
-            <button 
-              onClick={() => window.location.href = 'mailto:koffimikaela@gmail.com'}
+            {/* WhatsApp */}
+            <button
+              onClick={() => window.open('https://wa.me/22893653235', '_blank')}
               className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border-none outline-none"
-              aria-label="Email"
+              aria-label="WhatsApp"
             >
-              <Mail className="w-5 h-5" />
+              <FaWhatsapp className="w-5 h-5" />
             </button>
-            <button 
-              onClick={() => window.location.href = 'tel:+22893653235'}
+
+            {/* Téléphone */}
+            <button
+              onClick={() => (window.location.href = 'tel:+22893653235')}
               className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border-none outline-none"
               aria-label="Phone"
             >
               <Phone className="w-5 h-5" />
+            </button>
+
+            {/* Instagram */}
+            <button
+              onClick={() =>
+                window.open(
+                  'https://www.instagram.com/koffinanaa__/',
+                  '_blank'
+                )
+              }
+              className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border-none outline-none"
+              aria-label="Instagram"
+            >
+              <FaInstagram className="w-5 h-5" />
             </button>
           </div>
 

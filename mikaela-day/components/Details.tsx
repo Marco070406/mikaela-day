@@ -7,14 +7,15 @@ const details = [
   {
     icon: Calendar,
     title: 'Date & Heure',
-    content: '20 Juin 2026 à 18h00',
+    content: '20 Juin 2026 à 14h00',
+    subcontent: 'Et surtout soyez à l\'heure pour ne rien manquer !',
     color: 'bg-pink-100',
   },
   {
     icon: MapPin,
     title: 'Lieu',
     content: 'Maestro Beach',
-    subcontent: 'Célébration au bord de l\'eau',
+    subcontent: 'Célébration dans une cabane privée sur la plage, avec vue sur la mer',
     color: 'bg-rose-100',
   },
   {
@@ -28,7 +29,7 @@ const details = [
     icon: Info,
     title: 'Note Spéciale',
     content: 'Votre présence est le plus beau cadeau',
-    subcontent: 'Merci de confirmer avant le 1er Décembre',
+    subcontent: 'Merci de confirmer votre présence',
     color: 'bg-rose-50',
   },
 ];
@@ -40,7 +41,7 @@ const Details = () => {
         <div className="text-center mb-12 md:mb-20">
           <h2 className="font-serif text-3xl md:text-6xl mb-4 md:mb-6">L'Événement</h2>
           <p className="text-foreground/60 max-w-2xl mx-auto italic font-light text-sm md:text-base">
-            Chaque détail a été pensé pour rendre cette soirée magique.
+            Chaque détail a été pensé pour rendre cet après-midi magique.
           </p>
         </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Hero from '@/components/Hero';
 import Countdown from '@/components/Countdown';
 import Details from '@/components/Details';
+import Gallery from '@/components/Gallery';
 import Guestbook from '@/components/Guestbook';
 import Footer from '@/components/Footer';
 import FloatingParticles from '@/components/FloatingParticles';
@@ -28,6 +29,7 @@ export default function Home() {
           <Countdown />
           <Details />
           <Guestbook />
+          <Gallery />
           <Footer />
         </div>
       )}
