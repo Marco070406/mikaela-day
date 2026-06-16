@@ -27,17 +27,25 @@ const Gallery = () => {
 
     // Subscribe to real-time updates for the media table
     const channel = supabase
-      .channel('media-realtime')
+      .channel('schema-db-changes')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'media' },
         (payload) => {
-          console.log('Realtime insert received:', payload.new);
+          console.log('[Supabase Realtime] Nouveau média reçu !', payload.new);
           setMedia((prev) => [payload.new as MediaItem, ...prev]);
         }
       )
       .subscribe((status) => {
-        console.log('Realtime status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('[Supabase Realtime] Connecté avec succès !');
+        }
+        if (status === 'CLOSED') {
+          console.log('[Supabase Realtime] Connexion fermée.');
+        }
+        if (status === 'CHANNEL_ERROR') {
+          console.error('[Supabase Realtime] Erreur de connexion au canal.');
+        }
       });
 
     return () => {
