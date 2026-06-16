@@ -7,7 +7,7 @@ const details = [
   {
     icon: Calendar,
     title: 'Date & Heure',
-    content: '20 Juin 2026 à 14h00',
+    content: '20 Juin 2026 à 13h00',
     subcontent: 'Et surtout soyez à l\'heure pour ne rien manquer !',
     color: 'bg-pink-100',
   },
